@@ -4,7 +4,7 @@
   gather_facts: true
 
   vars:
-    target_dir: "/home/naman-chhabra/app"
+    target_dir: "/home/naman-chhabra/Desktop/app"
 
   tasks:
     - name: Create deployment directory
