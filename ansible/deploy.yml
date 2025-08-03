@@ -1,15 +1,14 @@
 - name: Deploy Spring Boot App locally
   hosts: localhost
-  become: true  # Needs root for file operations and port binding
-  gather_facts: true
-
+  gather_facts: false  # disables the sudo-requiring fact collection
   vars:
     target_dir: "/home/naman-chhabra/Desktop/app"
     jar_name: "task-manager.jar"
-    source_jar_path: "/var/lib/jenkins/workspace/task-manager-pipeline/target/task-manger-0.0.1-SNAPSHOT.jar"
+    source_jar_path: "/var/lib/jenkins/workspace/task-manager/target/task-manger-0.0.1-SNAPSHOT.jar"
 
   tasks:
     - name: Create deployment directory
+#      become: true
       file:
         path: "{{ target_dir }}"
         state: directory
@@ -23,13 +22,14 @@
       ignore_errors: true
 
     - name: Copy JAR file to deployment directory
+#      become: true
       copy:
         src: "{{ source_jar_path }}"
         dest: "{{ target_dir }}/{{ jar_name }}"
         mode: '0755'
         remote_src: yes
 
-    - name: Start Spring Boot app on port 8081
+    - name: Start Spring Boot app
       shell: nohup java -jar {{ target_dir }}/{{ jar_name }} --server.port=8081 > {{ target_dir }}/app.log 2>&1 &
       args:
         chdir: "{{ target_dir }}"
