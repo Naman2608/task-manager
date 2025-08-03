@@ -1,0 +1,30 @@
+- name: Deploy Spring Boot App locally
+  hosts: local
+  become: true
+  vars:
+    app_name: task-manager
+    jar_name: task-manger-0.0.1-SNAPSHOT.jar
+    src_jar_path: target/task-manger-0.0.1-SNAPSHOT.jar
+    deploy_dir: /opt/task-manager
+
+  tasks:
+    - name: Create deployment directory
+      file:
+        path: "{{ deploy_dir }}"
+        state: directory
+        mode: '0755'
+
+    - name: Stop running Spring Boot app if any
+      shell: |
+        pkill -f {{ jar_name }} || true
+      ignore_errors: yes
+
+    - name: Copy JAR to deployment directory
+      copy:
+        src: "{{ src_jar_path }}"
+        dest: "{{ deploy_dir }}/app.jar"
+        mode: '0755'
+
+    - name: Start Spring Boot app on port 8081
+      shell: |
+        nohup java -jar {{ deploy_dir }}/app.jar --server.port=8081 > {{ deploy_dir }}/app.log 2>&1 &
