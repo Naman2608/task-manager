@@ -2,7 +2,7 @@
   hosts: localhost
   gather_facts: false  # disables the sudo-requiring fact collection
   vars:
-    target_dir: "/home/naman-chhabra/Desktop/app"
+    target_dir: "/var/lib/jenkins/app"
     jar_name: "task-manager.jar"
     source_jar_path: "/var/lib/jenkins/workspace/task-manager/target/task-manger-0.0.1-SNAPSHOT.jar"
 
