@@ -22,6 +22,7 @@
 
 
     - name: Copy JAR file to deployment directory
+      become: true
       copy:
         src: /var/lib/jenkins/workspace/task-manager-pipeline/target/task-manger-0.0.1-SNAPSHOT.jar
         dest: "{{ target_dir }}/task-manager.jar"
