@@ -1,10 +1,12 @@
 - name: Deploy Spring Boot App locally
   hosts: localhost
-  become: false
+  become: true  # Needs root for file operations and port binding
   gather_facts: true
 
   vars:
     target_dir: "/home/naman-chhabra/Desktop/app"
+    jar_name: "task-manager.jar"
+    source_jar_path: "/var/lib/jenkins/workspace/task-manager-pipeline/target/task-manger-0.0.1-SNAPSHOT.jar"
 
   tasks:
     - name: Create deployment directory
@@ -15,21 +17,21 @@
 
     - name: Stop running Spring Boot app if any
       shell: |
-        if pgrep -f task-manager.jar; then
-          pkill -f task-manager.jar
+        if pgrep -f {{ jar_name }}; then
+          pkill -f {{ jar_name }}
         fi
       ignore_errors: true
 
-
     - name: Copy JAR file to deployment directory
-      become: true
       copy:
-        src: /var/lib/jenkins/workspace/task-manager-pipeline/target/task-manger-0.0.1-SNAPSHOT.jar
-        dest: "{{ target_dir }}/task-manager.jar"
+        src: "{{ source_jar_path }}"
+        dest: "{{ target_dir }}/{{ jar_name }}"
         mode: '0755'
-        remote_src: true
+        remote_src: yes
 
-    - name: Start Spring Boot app
-      shell: nohup java -jar {{ target_dir }}/task-manager.jar --server.port=8081 > {{ target_dir }}/app.log 2>&1 &
+    - name: Start Spring Boot app on port 8081
+      shell: nohup java -jar {{ target_dir }}/{{ jar_name }} --server.port=8081 > {{ target_dir }}/app.log 2>&1 &
+      args:
+        chdir: "{{ target_dir }}"
       async: 10
       poll: 0
